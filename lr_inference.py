@@ -4,7 +4,7 @@ import fasttext
 import joblib
 import os
 from sklearn.metrics import classification_report, precision_recall_fscore_support
-from mlp_inference import parse_label, read_vicon_data, 
+from mlp_inference import parse_label, read_vicon_data
 
 CHECKPOINT_PATH = "/kaggle/working/antonym-and-synonym-classifier/saved_checkpoints/lr_model.pkl"
 FASTTEXT_PATH = "cc.vi.300.bin"
