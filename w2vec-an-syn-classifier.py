@@ -22,7 +22,7 @@ WORD2VEC_PATH = "/kaggle/input/word2vec/W2V_150.txt"
 print("Đang load Word2Vec model (Gensim)...")
 try:
     # Nếu file là .bin (binary), để binary=True. Nếu là .txt, để binary=False.
-    word_vectors = KeyedVectors.load_word2vec_format(WORD2VEC_PATH, binary=True)
+    word_vectors = KeyedVectors.load_word2vec_format(WORD2VEC_PATH, binary=False)
     print(f"-> Load thành công! Kích thước vector: {word_vectors.vector_size}")
 except Exception as e:
     print(f"⚠ Lỗi load model: {e}")
