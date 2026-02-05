@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from gensim.models import KeyedVectors
+from gensim.scripts.glove2word2vec import glove2word2vec
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
@@ -19,14 +20,38 @@ WORD2VEC_PATH = "/kaggle/input/word2vec/W2V_150.txt"
 # ---------------------------------------------------------
 # LOAD WORD2VEC (GENSIM)
 # ---------------------------------------------------------
-print("Đang load Word2Vec model (Gensim)...")
-try:
-    # Nếu file là .bin (binary), để binary=True. Nếu là .txt, để binary=False.
-    word_vectors = KeyedVectors.load_word2vec_format(WORD2VEC_PATH, binary=False, unicode_errors='ignore')
-    print(f"-> Load thành công! Kích thước vector: {word_vectors.vector_size}")
-except Exception as e:
-    print(f"⚠ Lỗi load model: {e}")
-    print("Gợi ý: Kiểm tra đường dẫn hoặc thử đổi tham số binary=False")
+def load_embedding(path):
+    print(f"Đang xử lý file: {path}")
+    
+    # CÁCH 1: Thử load như file Word2Vec chuẩn (có header)
+    try:
+        model = KeyedVectors.load_word2vec_format(path, binary=False, unicode_errors='ignore')
+        print("-> Load thành công (Format chuẩn)!")
+        return model
+    except Exception as e:
+        print(f"-> Load chuẩn thất bại ({e}). Đang chuyển sang chế độ GloVe/No-Header...")
+
+    # CÁCH 2: Xử lý file thiếu Header (Lỗi expected 2, got 1)
+    try:
+        # Tạo tên file tạm có header
+        tmp_file = path + ".converted"
+        
+        # Hàm này sẽ đếm số dòng và tự thêm header vào đầu file
+        glove2word2vec(path, tmp_file)
+        
+        # Load file tạm vừa tạo
+        model = KeyedVectors.load_word2vec_format(tmp_file, binary=False, unicode_errors='ignore')
+        print("-> Load thành công (Đã convert từ GloVe)!")
+        return model
+    except Exception as e2:
+        print(f"❌ LỖI: Vẫn không load được. Chi tiết: {e2}")
+        return None
+
+# --- GỌI HÀM ---
+word_vectors = load_embedding(WORD2VEC_PATH)
+
+if word_vectors is None:
+    print("Dừng chương trình do lỗi model.")
     exit()
 
 def read_txt_data(file_path, label):
